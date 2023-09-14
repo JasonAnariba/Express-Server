@@ -1,7 +1,6 @@
 const express = require('express');
 const listEditRouter = express.Router();
 
-
 const tasks = [
   {
     id: "123456",
@@ -15,12 +14,30 @@ const tasks = [
   }
 ];
 
+// Middleware para manejar solicitudes POST con el cuerpo vacío o datos inválidos
+function validateCreateTask(req, res, next) {
+  const newTask = req.body;
+  if (!newTask || !newTask.description) {
+    return res.status(400).json({ error: "Datos de tarea no válidos" });
+  }
+  next();
+}
+
+// Middleware para manejar solicitudes PUT con el cuerpo vacío o datos inválidos
+function validateUpdateTask(req, res, next) {
+  const updatedTask = req.body;
+  if (!updatedTask || !updatedTask.description) {
+    return res.status(400).json({ error: "Datos de tarea no válidos" });
+  }
+  next();
+}
+
 // Ruta para crear una tarea
-listEditRouter.post('/crear', (req, res) => {
+listEditRouter.post('/crear', validateCreateTask, (req, res) => {
   const newTask = req.body; // Supongamos que el cuerpo de la solicitud contiene los datos de la nueva tarea
   tasks.push(newTask);
   res.status(201).json(newTask);
-  console.log("Tareas creada correctamente")
+  console.log("Tareas creada correctamente");
 });
 
 // Ruta para eliminar una tarea por ID
@@ -36,7 +53,7 @@ listEditRouter.delete('/:taskId', (req, res) => {
 });
 
 // Ruta para actualizar una tarea por ID
-listEditRouter.put('/:taskId', (req, res) => {
+listEditRouter.put('/:taskId', validateUpdateTask, (req, res) => {
   const taskId = req.params.taskId;
   const updatedTask = req.body; // Supongamos que el cuerpo de la solicitud contiene los datos actualizados de la tarea
   const index = tasks.findIndex(task => task.id === taskId);

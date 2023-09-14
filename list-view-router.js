@@ -19,6 +19,15 @@ const tasks = [
   }
 ];
 
+// Middleware para validar parámetros en list-view-router
+function validateParams(req, res, next) {
+  const taskId = req.params.taskId;
+  if (!taskId || !/^\d+$/.test(taskId)) {
+    return res.status(400).json({ error: "Parámetro taskId no válido" });
+  }
+  next();
+}
+
 // Ruta para listar tareas completas
 listViewRouter.get('/completed', (req, res) => {
   const completedTasks = tasks.filter(task => task.isCompleted);
@@ -29,6 +38,17 @@ listViewRouter.get('/completed', (req, res) => {
 listViewRouter.get('/incomplete', (req, res) => {
   const incompleteTasks = tasks.filter(task => !task.isCompleted);
   res.json(incompleteTasks);
+});
+
+// Agregar el middleware para validar parámetros a la ruta que requiere parámetros
+listViewRouter.get('/:taskId', validateParams, (req, res) => {
+  const taskId = req.params.taskId;
+  const task = tasks.find(task => task.id === taskId);
+  if (task) {
+    res.json(task);
+  } else {
+    res.status(404).json({ error: "Tarea no encontrada" });
+  }
 });
 
 module.exports = listViewRouter;
