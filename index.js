@@ -1,27 +1,18 @@
 const express = require('express');
 const app = express();
+const port = 3005;
+const listViewRouter = require('./list-view-router');
+const listEditRouter = require('./list-edit-router');
 
-// Iniciar el servidor en el puerto 3000
-const port = 3000;
-// Lista de tareas
-const tasks = [
-  {
-    id: "123456",
-    isCompleted: false,
-    description: "Walk the dog"
-  },
-  {
-    id: "12345",
-    isCompleted: false,
-    descripcion:"estudiar"
-  }
-];
+// ...
 
-// Ruta para obtener la lista de tareas
-app.get('/tasks', (req, res) => {
-  res.json(tasks);
-});
+// Montar el router de lista de visualización en '/list-view'
+app.use('/list-view', listViewRouter);
 
+// Montar el router de edición de lista en '/list-edit'
+app.use('/list-edit', listEditRouter);
+
+// ...
 
 app.listen(port, () => {
   console.log(`Servidor Express en funcionamiento en el puerto ${port}`);
